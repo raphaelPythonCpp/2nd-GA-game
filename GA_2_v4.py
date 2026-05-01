@@ -267,7 +267,7 @@ class Joueur:
         self.y = min(self.yMax, max(self.yMin, self.y))
 
         self.d = max(1e-2, 2*abs((self.x-self.jeu.wF/2))/(self.xMax-self.xMin))
-        self.score += 1 + 0.2 * (1-self.d)
+        self.score += 1 + 5 * (1-self.d)
         self.nbCoups += 1
 
     def afficher(self):
@@ -324,7 +324,7 @@ horloge = pygame.time.Clock()
 police = pygame.font.SysFont("Arial", 10, bold=True, italic=False)
 
 nomDossier = os.path.dirname(__file__)
-nomFichier = os.path.join(nomDossier, "GA_2_v2.txt")
+nomFichier = os.path.join(nomDossier, "GA_2_v4.txt")
 kNN = 2
 env = Jeu(fenetre, police, horloge,
           nbJoueurs=10, lCouches=[1+4*kNN, 32, 16, 1], nbBalles=4,

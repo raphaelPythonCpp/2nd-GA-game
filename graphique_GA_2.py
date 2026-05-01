@@ -4,6 +4,7 @@ from matplotlib.animation import FuncAnimation
 from matplotlib.colors import LinearSegmentedColormap
 import numpy as np
 from math import floor
+import os
 
 def animer(courbe, listeLValeurs, listeLCouleurs, garder):
     def update(frame):
@@ -115,20 +116,21 @@ def changer_valeur_slider(_, slider, visuel=True):
     if visuel:
         afficher()
 
-with open("GA_2_v2.txt", 'r') as fichier:
+nomDossier = os.path.dirname(__file__)
+nomFichier = os.path.join(nomDossier, "GA_2_v2.txt")
+with open(nomFichier, 'r') as fichier:
     listeLRes = eval(fichier.read())
 (nbJoueurs, nbBalles, nbGenerations, nbParties, lCouches, kNN), listeLRes, meilleurNN = listeLRes
 nbGenerations = len(listeLRes)
-listeLValeursNormales = np.array([[(iG, iJ, score, nbCoups) for iJ, score, nbCoups, dicoNN in lRes] for iG,lRes in enumerate(listeLRes)])
-listeLPoidsNormals = np.array([[dicoNN['0.weight'] for iJ, score, nbCoups, dicoNN in lRes] for lRes in listeLRes])
+listeLValeursNormales = np.array([[(iG, vraiIJ, score, nbCoups) for vraiIJ, score, nbCoups, dicoNN in lRes] for iG,lRes in enumerate(listeLRes)])
+listeLPoidsNormals = np.array([[dicoNN['0.weight'] for vraiIJ, score, nbCoups, dicoNN in lRes] for lRes in listeLRes])
 listeLValeursJoueurs = [[] for _ in range(nbGenerations)]
 listeLPoidsJoueurs = [[] for _ in range(nbGenerations)]
+lIJ = sorted([vraiIJ for vraiIJ, *_ in listeLRes[0]])
 for iG, lRes in enumerate(listeLRes):
-    dico = {}
-    for iJ, score, nbCoups, dicoNN in lRes:
-        dico[iJ] = (iJ, score, nbCoups, dicoNN['0.weight'])
-    listeLValeursJoueurs[iG] = [(iG, *dico[i][:3]) for i in range(nbJoueurs)]
-    listeLPoidsJoueurs[iG] = [dico[i][3] for i in range(nbJoueurs)]
+    dico = {vraiIJ : (vraiIJ, score, nbCoups, dicoNN['0.weight']) for vraiIJ, score, nbCoups, dicoNN in lRes}
+    listeLValeursJoueurs[iG] = [(iG, *dico[iJ][:3]) for iJ in lIJ]
+    listeLPoidsJoueurs[iG] = [dico[iJ][3] for iJ in lIJ]
 listeLValeursJoueurs = np.array(listeLValeursJoueurs)
 listeLPoidsJoueurs = np.array(listeLPoidsJoueurs)
 
@@ -159,10 +161,10 @@ boutonAnimations = Button(axe5, "None", color=color1, hovercolor=color2)
 boutonAnimations.on_clicked(changer_mode_animations)
 animation1, animation2, animation3 = None, None, None
 
-sliderV1 = Slider(axe6, "input 1", valmin=1, valmax=lCouches[0], valstep=1, valinit=0, track_color=color1, facecolor=color2)
+sliderV1 = Slider(axe6, "input 1", valmin=1, valmax=lCouches[0], valstep=1, valinit=1, track_color=color1, facecolor=color2)
 sliderV1.on_changed(lambda _ : changer_valeur_slider(_, sliderV1))
 
-sliderV2 = Slider(axe7, "input 2", valmin=1, valmax=lCouches[0], valstep=1, valinit=0, track_color=color1, facecolor=color2)
+sliderV2 = Slider(axe7, "input 2", valmin=1, valmax=lCouches[0], valstep=1, valinit=1, track_color=color1, facecolor=color2)
 sliderV2.on_changed(lambda _ : changer_valeur_slider(_, sliderV2))
 
 mode = 1
